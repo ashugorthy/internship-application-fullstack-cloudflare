@@ -46,14 +46,15 @@ async function handleRequest(request) {
     if (cookie === null) {        //Check if the cookie is null
       randomValue = jsonData.variants[Math.floor(Math.random() * arrLen)];   //If null then randomly pick among the two variants
     } else {
-      randomValue = cookie;   //If the cookie value is set, then assign that value to the randomValue variable
+      let str = cookie.split('=')
+      randomValue = str[str.length-1];   //If the cookie value is set, then assign that value to the randomValue variable
     }
     let variant = randomValue[randomValue.length-1];   //Get the number of the variant. If it is 1 or 2. This will be used as the key to the dictionary
     var newData = await fetch(randomValue)    //Fetch the contents of the URL chosen randomly
     const rewriter = new HTMLRewriter().on('*', new ElementHandler(variant))  //Get all the elements and also pass the number of the variant as an argument
 
     let newResponse = rewriter.transform(newData);  //Tranform with the new HTML
-    newResponse.headers.set('Set-Cookie',randomValue); //Setting the value of the cookie
+    newResponse.headers.set('Set-Cookie','URL='+randomValue); //Setting the value of the cookie
     return newResponse;   //Return the response of the tranformed HTML
   } else {
     alert("HTTP-Error: " + data.status);  //If there is an error fetching the contents of the url
